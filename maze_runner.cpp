@@ -33,7 +33,20 @@ bool carregar_labirinto(const string& caminho_arquivo, vector<vector<char>>& lab
     }
     arquivo.close();
     return true;
-}
+
+void imprimir_labirinto(const vector<vector<char>>& labirinto) {
+    this_thread::sleep_for(chrono::milliseconds(200));
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+    for (const auto& linha : labirinto) {
+        for (const auto& celula : linha) {
+            cout << celula;
+        }
+        cout << endl;
+    }
 
 // Função principal para navegar pelo labirinto
 bool walk(Position pos) {
