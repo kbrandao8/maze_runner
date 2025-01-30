@@ -1,56 +1,38 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
+#include <vector
+#include <string>
 #include <stack>
 #include <thread>
 #include <chrono>
+#include <mutex>
+#include <atomic>
 
 // Representação do labirinto
-using Maze = std::vector<std::vector<char>>;
+using namespace std;
+mutex labirinto_mutex;  // Mutex para sincronizar o acesso ao labirinto
+atomic<bool> encontrou_saida(false);  // Flag para indicar se a saída foi encontrada
 
-// Estrutura para representar uma posição no labirinto
-struct Position {
-    int row;
-    int col;
-};
-
-// Variáveis globais
-Maze maze;
-int num_rows;
-int num_cols;
-std::stack<Position> valid_positions;
-
-// Função para carregar o labirinto de um arquivo
-Position load_maze(const std::string& file_name) {
-    // TODO: Implemente esta função seguindo estes passos:
-    // 1. Abra o arquivo especificado por file_name usando std::ifstream
-    // 2. Leia o número de linhas e colunas do labirinto
-    // 3. Redimensione a matriz 'maze' de acordo (use maze.resize())
-    // 4. Leia o conteúdo do labirinto do arquivo, caractere por caractere
-    // 5. Encontre e retorne a posição inicial ('e')
-    // 6. Trate possíveis erros (arquivo não encontrado, formato inválido, etc.)
-    // 7. Feche o arquivo após a leitura
-    
-    return {-1, -1}; // Placeholder - substitua pelo valor correto
-}
-
-// Função para imprimir o labirinto
-void print_maze() {
-    // TODO: Implemente esta função
-    // 1. Percorra a matriz 'maze' usando um loop aninhado
-    // 2. Imprima cada caractere usando std::cout
-    // 3. Adicione uma quebra de linha (std::cout << '\n') ao final de cada linha do labirinto
-}
-
-// Função para verificar se uma posição é válida
-bool is_valid_position(int row, int col) {
-    // TODO: Implemente esta função
-    // 1. Verifique se a posição está dentro dos limites do labirinto
-    //    (row >= 0 && row < num_rows && col >= 0 && col < num_cols)
-    // 2. Verifique se a posição é um caminho válido (maze[row][col] == 'x')
-    // 3. Retorne true se ambas as condições forem verdadeiras, false caso contrário
-
-    return false; // Placeholder - substitua pela lógica correta
+bool carregar_labirinto(const string& caminho_arquivo, vector<vector<char>>& labirinto, int& linhas, int& colunas, pair<int, int>& inicio) {
+    ifstream arquivo(caminho_arquivo);
+    if (!arquivo.is_open()) {
+        cerr << "Erro ao abrir o arquivo." << endl;
+        return false;
+    }
+    arquivo >> linhas >> colunas;
+    labirinto.resize(linhas);
+    string linha;
+    getline(arquivo, linha);
+    for (int i = 0; i < linhas; i++) {
+        getline(arquivo, linha);
+        labirinto[i] = vector<char>(linha.begin(), linha.end());
+        size_t pos = linha.find('e');
+        if (pos != string::npos) {
+            inicio = {i, static_cast<int>(pos)};
+        }
+    }
+    arquivo.close();
+    return true;
 }
 
 // Função principal para navegar pelo labirinto
